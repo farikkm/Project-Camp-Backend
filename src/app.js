@@ -2,6 +2,9 @@ import cors from "cors";
 import express from "express";
 import dotenv from "dotenv";
 
+// Import routes
+import healthCheckRouter from "./routes/healthcheck.routes.js";
+
 dotenv.config({
 	path: "./.env",
 });
@@ -31,6 +34,9 @@ app.use(
 );
 app.use(express.static("public"));
 app.use(cors(corsOptions));
+
+// Imported routes
+app.use("/api/v1/healthcheck", healthCheckRouter);
 
 // Routes
 app.get("/", cors(corsOptions), (_, res) => {
