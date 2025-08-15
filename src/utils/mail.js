@@ -1,4 +1,46 @@
 import Mailgen from "mailgen";
+import nodemailer from "nodemailer";
+
+const sendMail = async (options) => {
+	const mailGenerator = new Mailgen({
+		theme: "default",
+		product: {
+			name: "Project Manager",
+			link: "https://projectmanager.vercel.app",
+		},
+	});
+
+	const emailHTML = mailGenerator.generate(options.mailGeneratorContent);
+	const emailText = mailGenerator.generatePlaintext(
+		options.mailGeneratorContent,
+	);
+
+	const transporter = nodemailer.createTransport({
+		host: process.env.MAILTRAP_SMTP_HOST,
+		port: process.env.MAILTRAP_SMTP_PORT,
+		auth: {
+			user: process.env.MAILTRAP_SMTP_USERNAME,
+			pass: process.env.MAILTRAP_SMTP_PASSWORD,
+		},
+	});
+
+	const mail = {
+		from: "mail.projectmanager@example.com",
+		to: options.email,
+		subject: options.subject,
+		text: emailText,
+		html: emailHTML,
+	};
+
+	try {
+		await transporter.sendMail(mail);
+	} catch (error) {
+		console.error(
+			"Email service failed. Make sure you passed your credentials",
+		);
+		console.error("Error:", error);
+	}
+};
 
 const emailVerficationMailgenContent = (username, verificationUrl) => ({
 	body: {
@@ -34,3 +76,9 @@ const resetPasswordMailgenContent = (username, verificationUrl) => ({
 			"Need help, or have questions? Just reply to this email, we'd love to help.",
 	},
 });
+
+export {
+	emailVerficationMailgenContent,
+	resetPasswordMailgenContent,
+	sendMail,
+};
