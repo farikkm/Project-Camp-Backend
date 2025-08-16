@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 
 // Import routes
 import healthCheckRouter from "./routes/healthcheck.routes.js";
+import authRouter from "./routes/auth.routes.js";
 
 dotenv.config({
 	path: "./.env",
@@ -37,6 +38,7 @@ app.use(cors(corsOptions));
 
 // Imported routes
 app.use("/api/v1/healthcheck", healthCheckRouter);
+app.use("/api/v1/auth", authRouter);
 
 // Routes
 app.get("/", cors(corsOptions), (_, res) => {
