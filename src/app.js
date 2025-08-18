@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 // Import routes
 import healthCheckRouter from "./routes/healthcheck.routes.js";
@@ -35,6 +36,7 @@ app.use(
 );
 app.use(express.static("public"));
 app.use(cors(corsOptions));
+app.use(cookieParser());
 
 // Imported routes
 app.use("/api/v1/healthcheck", healthCheckRouter);
