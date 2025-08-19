@@ -1,10 +1,16 @@
 import { Router } from "express";
-import { registerUser, loginUser } from "../controllers/auth.controllers.js";
+import {
+	registerUser,
+	loginUser,
+	logoutUser,
+} from "../controllers/auth.controllers.js";
 import {
 	userLoginValidator,
 	userRegistrationValidator,
 } from "../validators/index.js";
 import validate from "../middlewares/validator.middlewares.js";
+
+import verifyJWT from "../middlewares/auth.middlewares.js";
 
 const router = Router();
 
@@ -13,5 +19,8 @@ router
 	.post(userRegistrationValidator(), validate, registerUser);
 
 router.route("/login").post(userLoginValidator(), validate, loginUser);
+
+// Secure routes
+router.route("/logout").post(verifyJWT, logoutUser);
 
 export default router;
