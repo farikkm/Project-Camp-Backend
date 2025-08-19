@@ -3,6 +3,7 @@ import { ApiError } from "../utils/api-error.js";
 import { User } from "../models/user.models.js";
 import { sendMail, emailVerficationMailgenContent } from "../utils/mail.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import crypto from "crypto";
 
 const generateAccessAndRefreshToken = async (userId) => {
 	try {
@@ -146,4 +147,35 @@ const logoutUser = asyncHandler(async (req, res) => {
 		.json(new ApiResponse(200, null, "User successfully logged out"));
 });
 
-export { registerUser, loginUser, logoutUser };
+const verifyEmail = asyncHandler(async (req, res) => {
+	const { verificationToken } = req.params;
+
+	const hashedToken = crypto
+		.createHash("sha256")
+		.update(verificationToken)
+		.digest("hex");
+
+	const user = await User.findOne({
+		emailVerificationToken: hashedToken,
+	});
+
+	if (!user) {
+		throw new ApiError("400", "Invalid verification token");
+	}
+
+	if (Date.now() > user.emailVerificationExpiry) {
+		throw new ApiError("400", "Expired verification token");
+	}
+
+	user.isEmailVerified = true;
+	user.emailVerificationToken = null;
+	user.emailVerificationExpiry = null;
+
+	await user.save();
+
+	res
+		.status(200)
+		.json(new ApiResponse(200, null, "Email verified successfully"));
+});
+
+export { registerUser, loginUser, logoutUser, verifyEmail };

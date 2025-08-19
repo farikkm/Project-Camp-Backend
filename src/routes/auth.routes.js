@@ -3,6 +3,7 @@ import {
 	registerUser,
 	loginUser,
 	logoutUser,
+	verifyEmail,
 } from "../controllers/auth.controllers.js";
 import {
 	userLoginValidator,
@@ -19,6 +20,8 @@ router
 	.post(userRegistrationValidator(), validate, registerUser);
 
 router.route("/login").post(userLoginValidator(), validate, loginUser);
+
+router.route("/verify-email/:verificationToken").get(verifyEmail);
 
 // Secure routes
 router.route("/logout").post(verifyJWT, logoutUser);
